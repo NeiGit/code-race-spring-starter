@@ -1,5 +1,8 @@
 package com.coderace.dto;
 
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode
 public class PersonRequestDTO {
     private String name;
     private Integer age;

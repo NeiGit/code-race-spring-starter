@@ -4,7 +4,6 @@ import com.coderace.dto.PersonRequestDTO;
 import com.coderace.dto.PersonResponseDTO;
 import com.coderace.entity.Person;
 import com.coderace.repository.PersonRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,8 +12,11 @@ import java.util.List;
 @Service
 public class PersonService {
 
-    @Autowired
-    PersonRepository repository;
+    private final PersonRepository repository;
+
+    public PersonService(PersonRepository repository) {
+        this.repository = repository;
+    }
 
     public PersonResponseDTO create(PersonRequestDTO requestDTO) {
         final Person person = new Person(requestDTO.getName(), requestDTO.getAge());
