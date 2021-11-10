@@ -2,6 +2,8 @@ package com.coderace.service;
 
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class LogService {
     private String name;
@@ -25,6 +27,6 @@ public class LogService {
     }
 
     private void log(String severity, String message) {
-        System.out.printf("[%s] - service: %s - %s%n", severity, this.name, message);
+        System.out.printf("%s - [%s] - %s - %s%n", LocalDateTime.now(), severity, this.name, message);
     }
 }

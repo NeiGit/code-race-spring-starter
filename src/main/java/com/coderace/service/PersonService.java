@@ -13,15 +13,21 @@ import java.util.List;
 public class PersonService {
 
     private final PersonRepository repository;
+    private final LogService log;
 
-    public PersonService(PersonRepository repository) {
+    public PersonService(PersonRepository repository, LogService log) {
         this.repository = repository;
+        this.log = log;
+
+        this.log.setName("PersonService");
     }
 
     public PersonResponseDTO create(PersonRequestDTO requestDTO) {
         final Person person = new Person(requestDTO.getName(), requestDTO.getAge());
 
         final Person persistedPerson = repository.save(person);
+
+        this.log.info("Created person with id " + persistedPerson.getId());
 
         return buildPersonResponseDto(persistedPerson);
     }
