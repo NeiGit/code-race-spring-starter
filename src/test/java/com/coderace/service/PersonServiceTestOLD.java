@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class PersonServiceTest {
+class PersonServiceTestOLD {
 
     @Mock
     private PersonRepository repository;
