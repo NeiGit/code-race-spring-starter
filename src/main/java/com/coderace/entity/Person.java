@@ -1,6 +1,8 @@
 package com.coderace.entity;
 
 
+import com.coderace.entity.enums.Country;
+
 import javax.persistence.*;
 
 @Entity
@@ -14,12 +16,16 @@ public class Person {
     private String name;
     private int age;
 
+    @Enumerated(EnumType.STRING)
+    private Country country;
+
     public Person() {
     }
 
-    public Person(String name, int age) {
+    public Person(String name, int age, Country country) {
         this.name = name;
         this.age = age;
+        this.country = country;
     }
 
     public Person(int id, String name, int age) {
@@ -38,6 +44,10 @@ public class Person {
 
     public int getId() {
         return id;
+    }
+
+    public Country getCountry() {
+        return this.country;
     }
 
     public void setId(int id) {

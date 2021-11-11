@@ -3,6 +3,7 @@ package com.coderace.service;
 import com.coderace.dto.PersonRequestDTO;
 import com.coderace.dto.PersonResponseDTO;
 import com.coderace.entity.Person;
+import com.coderace.entity.enums.Country;
 import com.coderace.repository.PersonRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +24,15 @@ public class PersonService {
     }
 
     public PersonResponseDTO create(PersonRequestDTO requestDTO) {
-        final Person person = new Person(requestDTO.getName(), requestDTO.getAge());
+        this.validate(requestDTO);
+
+        final Country country = this.resolveCountry(requestDTO.getCountry());
+
+        final Person person = new Person(requestDTO.getName(), requestDTO.getAge(), country);
 
         final Person persistedPerson = repository.save(person);
 
-        this.log.info("Created person with id " + persistedPerson.getId());
+        this.log.info("Successfully created person with id " + persistedPerson.getId());
 
         return buildPersonResponseDto(persistedPerson);
     }
@@ -46,12 +51,29 @@ public class PersonService {
         return responseDTOs;
     }
 
+    private void validate(PersonRequestDTO requestDTO) {
+        if (requestDTO.getAge() <= 0) {
+            throw new RuntimeException("age must be greater than 0");
+        }
+    }
+
+    private Country resolveCountry(String countryCode) {
+        final Country country = Country.fromCode(countryCode);
+
+        if (country == Country.UNDEFINED) {
+            log.warning("Person without country");
+        }
+
+        return country;
+    }
+
     private PersonResponseDTO buildPersonResponseDto(Person persistedPerson) {
         final PersonResponseDTO responseDTO = new PersonResponseDTO();
 
         responseDTO
                 .setName(persistedPerson.getName())
-                .setAge(persistedPerson.getAge());
+                .setAge(persistedPerson.getAge())
+                .setCountry(persistedPerson.getCountry().getCode());
 
         return responseDTO;
     }

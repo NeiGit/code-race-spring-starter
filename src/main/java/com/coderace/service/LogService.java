@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 public class LogService {
     private String name;
 
-
     public LogService setName(String name) {
         this.name = name;
         return this;
