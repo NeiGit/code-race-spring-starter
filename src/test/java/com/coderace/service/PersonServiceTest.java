@@ -13,7 +13,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -57,6 +61,37 @@ public class PersonServiceTest {
                 () -> assertEquals(age, response.getAge()),
                 () -> assertEquals(country.getCode(), response.getCountry())
         );
+    }
+
+    @Test
+    @DisplayName("getAll | no filters | ok")
+    void getAllNoFiltersOk() {
+        final Person person1 = new Person("name1", 1, Country.ARG);
+        final Person person2 = new Person("name2", 2, Country.BRA);
+
+        final List<Person> persons = Arrays.asList(person1, person2);
+
+        when(repository.findAll()).thenReturn(persons);
+
+        final List<PersonResponseDTO> result = service.getAll(null, null);
+
+        assertEquals(persons.stream().map(this::toDto).collect(Collectors.toList()), result);
+    }
+
+    @Test
+    @DisplayName("getAll | with filters | ok")
+    void getAllWithFiltersOk() {
+        final Person person1 = new Person("name1", 4, Country.ARG);
+        final Person person2 = new Person("name2", 5, Country.USA);
+        final Person person3 = new Person("name3", 2, Country.BRA);
+
+        final List<Person> persons = Arrays.asList(person1, person2, person3);
+
+        when(repository.findAll()).thenReturn(persons);
+
+        final List<PersonResponseDTO> result = service.getAll(3, "arg");
+
+        assertEquals(Collections.singletonList(this.toDto(person1)), result);
     }
 
     @Test
@@ -117,4 +152,16 @@ public class PersonServiceTest {
         // then
         assertNull(response);
     }
+
+    private PersonResponseDTO toDto(Person person) {
+        final PersonResponseDTO responseDTO = new PersonResponseDTO();
+
+        responseDTO
+                .setName(person.getName())
+                .setAge(person.getAge())
+                .setCountry(person.getCountry().getCode());
+
+        return responseDTO;
+    }
+
 }

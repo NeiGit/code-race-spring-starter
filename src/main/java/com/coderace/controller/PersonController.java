@@ -2,7 +2,6 @@ package com.coderace.controller;
 
 import com.coderace.dto.PersonRequestDTO;
 import com.coderace.dto.PersonResponseDTO;
-import com.coderace.service.log.LogService;
 import com.coderace.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,17 +39,8 @@ public class PersonController {
     }
 
     @GetMapping
-    public List<PersonResponseDTO> getAll() {
-        return service.getAll();
+    public List<PersonResponseDTO> getAll(@RequestParam(required = false) Integer age,
+                                          @RequestParam(required = false) String country) {
+        return service.getAll(age, country);
     }
-
-    /*
-    1 - Agregar atributo 'country' a Person. Debe ser un enum con los codigos ISO de paises:
-	- ARG, USA, BRA, etc.
-	- Agregar factory method fromString()
-     */
-
-    /*
-    5 - Validar que la edad sea > 0, arrojar excepción.
-     */
 }

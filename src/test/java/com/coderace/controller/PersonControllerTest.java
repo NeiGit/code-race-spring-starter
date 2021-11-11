@@ -2,8 +2,8 @@ package com.coderace.controller;
 
 import com.coderace.dto.PersonRequestDTO;
 import com.coderace.dto.PersonResponseDTO;
-import com.coderace.service.log.LogService;
 import com.coderace.service.PersonService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -32,9 +35,6 @@ public class PersonControllerTest {
 
     @MockBean
     PersonService service;
-
-    @MockBean
-    LogService log;
 
 
     @Test
@@ -114,5 +114,33 @@ public class PersonControllerTest {
 
         // assert - then
         assertEquals(HttpStatus.NOT_FOUND.value(), result.getResponse().getStatus());
+    }
+
+    @Test
+    @DisplayName("getAll | ok")
+    void getAllOk() throws Exception {
+        // setup - given
+        final int age = 1;
+        final String country = "arg";
+
+        final List<PersonResponseDTO> expectedResponse = Arrays.asList(
+                new PersonResponseDTO().setName("name1").setAge(1).setCountry("arg"),
+                new PersonResponseDTO().setName("name2").setAge(2).setCountry("bra")
+        );
+
+        when(service.getAll(age, country)).thenReturn(expectedResponse);
+
+        // perform - when
+        final MvcResult result = mvc.perform(get("/person")
+                .param("age", String.valueOf(age))
+                .param("country", country))
+                .andReturn();
+
+        final List<PersonResponseDTO> actualResponse =
+                objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<PersonResponseDTO>>(){});
+
+        // assert - then
+        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
+        assertEquals(expectedResponse, actualResponse);
     }
 }

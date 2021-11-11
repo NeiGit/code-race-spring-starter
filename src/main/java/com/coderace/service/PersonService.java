@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PersonService {
@@ -38,18 +39,38 @@ public class PersonService {
         return buildPersonResponseDto(persistedPerson);
     }
 
-    public List<PersonResponseDTO> getAll() {
-        final List<Person> persons = repository.findAll();
+    public List<PersonResponseDTO> getAll(Integer minAge, String country) {
+        final List<Person> allPersons = repository.findAll();
+        final List<Person> filteredPersons = this.filter(allPersons, minAge, country);
 
         final List<PersonResponseDTO> responseDTOs = new ArrayList<>();
 
-        for (Person person : persons) {
+        for (Person person : filteredPersons) {
             final PersonResponseDTO responseDTO = buildPersonResponseDto(person);
 
             responseDTOs.add(responseDTO);
         }
 
         return responseDTOs;
+    }
+
+    public PersonResponseDTO findById(int id) {
+        return this.repository.findById(id)
+                .map(this::buildPersonResponseDto)
+                .orElse(null);
+    }
+
+    private List<Person> filter(List<Person> persons, Integer minAge, String countryCode) {
+        final Country countryFilter = countryCode == null ? null : Country.fromCode(countryCode);
+        int ageFilter = minAge != null ? minAge : Integer.MIN_VALUE;
+
+        return persons.stream()
+                .filter(person -> {
+                    final boolean countryCondition = countryFilter == null || person.getCountry() == countryFilter;
+                    final boolean ageCondition = person.getAge() > ageFilter;
+
+                    return countryCondition && ageCondition;
+                }).collect(Collectors.toList());
     }
 
     private void validate(PersonRequestDTO requestDTO) {
@@ -77,11 +98,5 @@ public class PersonService {
                 .setCountry(persistedPerson.getCountry().getCode());
 
         return responseDTO;
-    }
-
-    public PersonResponseDTO findById(int id) {
-        return this.repository.findById(id)
-                .map(this::buildPersonResponseDto)
-                .orElse(null);
     }
 }
