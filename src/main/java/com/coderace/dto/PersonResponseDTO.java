@@ -7,6 +7,7 @@ public class PersonResponseDTO {
     private String name;
     private int age;
     private String country;
+    private String bornDate;
 
     public String getName() {
         return name;
@@ -32,6 +33,15 @@ public class PersonResponseDTO {
 
     public PersonResponseDTO setCountry(String country) {
         this.country = country;
+        return this;
+    }
+
+    public String getBornDate() {
+        return bornDate;
+    }
+
+    public PersonResponseDTO setBornDate(String bornDate) {
+        this.bornDate = bornDate;
         return this;
     }
 }

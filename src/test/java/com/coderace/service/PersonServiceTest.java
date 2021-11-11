@@ -13,6 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -154,12 +156,14 @@ public class PersonServiceTest {
     }
 
     private PersonResponseDTO toDto(Person person) {
+        final LocalDate bornDate = LocalDateTime.now().minusYears(person.getAge()).toLocalDate();
         final PersonResponseDTO responseDTO = new PersonResponseDTO();
 
         responseDTO
                 .setName(person.getName())
                 .setAge(person.getAge())
-                .setCountry(person.getCountry().getCode());
+                .setCountry(person.getCountry().getCode())
+                .setBornDate(bornDate.toString());
 
         return responseDTO;
     }

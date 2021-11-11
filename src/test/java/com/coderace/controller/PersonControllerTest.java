@@ -42,7 +42,7 @@ public class PersonControllerTest {
     void createOk() throws Exception {
         // setup - given
         final PersonRequestDTO request = new PersonRequestDTO().setName("name").setAge(1).setCountry("arg");
-        final PersonResponseDTO expectedResponse = new PersonResponseDTO().setName("name").setAge(1).setCountry("arg");
+        final PersonResponseDTO expectedResponse = new PersonResponseDTO().setName("name").setAge(1).setCountry("arg").setBornDate("born-date");
 
         when(service.create(request)).thenReturn(expectedResponse);
 
@@ -86,7 +86,7 @@ public class PersonControllerTest {
     void findByIdOk() throws Exception {
         // setup - given
         final int id = 1;
-        final PersonResponseDTO expectedResponse = new PersonResponseDTO().setName("name").setAge(1).setCountry("arg");
+        final PersonResponseDTO expectedResponse = new PersonResponseDTO().setName("name").setAge(1).setCountry("arg").setBornDate("born-date");
 
         when(service.findById(id)).thenReturn(expectedResponse);
 
@@ -124,8 +124,8 @@ public class PersonControllerTest {
         final String country = "arg";
 
         final List<PersonResponseDTO> expectedResponse = Arrays.asList(
-                new PersonResponseDTO().setName("name1").setAge(1).setCountry("arg"),
-                new PersonResponseDTO().setName("name2").setAge(2).setCountry("bra")
+                new PersonResponseDTO().setName("name1").setAge(1).setCountry("arg").setBornDate("born-date"),
+                new PersonResponseDTO().setName("name2").setAge(2).setCountry("bra").setBornDate("born-date")
         );
 
         when(service.getAll(age, country)).thenReturn(expectedResponse);

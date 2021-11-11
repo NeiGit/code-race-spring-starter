@@ -8,6 +8,8 @@ import com.coderace.repository.PersonRepository;
 import com.coderace.service.log.LogService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -90,12 +92,15 @@ public class PersonService {
     }
 
     private PersonResponseDTO buildPersonResponseDto(Person persistedPerson) {
+        final LocalDate bornDate = LocalDateTime.now().minusYears(persistedPerson.getAge()).toLocalDate();
+
         final PersonResponseDTO responseDTO = new PersonResponseDTO();
 
         responseDTO
                 .setName(persistedPerson.getName())
                 .setAge(persistedPerson.getAge())
-                .setCountry(persistedPerson.getCountry().getCode());
+                .setCountry(persistedPerson.getCountry().getCode())
+                .setBornDate(bornDate.toString());
 
         return responseDTO;
     }
