@@ -12,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -73,5 +75,45 @@ public class PersonServiceTest {
         assertEquals("age must be greater than 0", exception.getMessage());
 
         verify(repository, never()).save(any(Person.class));
+    }
+
+    @Test
+    @DisplayName("findById | ok")
+    void findByIdOk() {
+        // given
+        final int id = 1;
+
+        final String name = "name";
+        final int age = 18;
+        final Country country = Country.ARG;
+
+        final Person person = new Person(name, age, country);
+
+        when(repository.findById(id)).thenReturn(Optional.of(person));
+
+        // when
+        final PersonResponseDTO response = service.findById(id);
+
+        // then
+        assertAll("Expected result",
+                () -> assertEquals(name, response.getName()),
+                () -> assertEquals(age, response.getAge()),
+                () -> assertEquals(country.getCode(), response.getCountry())
+        );
+    }
+
+    @Test
+    @DisplayName("findById | not found | should return null")
+    void findByIdNotFound() {
+        // given
+        final int id = 1;
+
+        when(repository.findById(id)).thenReturn(Optional.empty());
+
+        // when
+        final PersonResponseDTO response = service.findById(id);
+
+        // then
+        assertNull(response);
     }
 }

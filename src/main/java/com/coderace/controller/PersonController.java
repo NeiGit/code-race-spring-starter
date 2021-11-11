@@ -34,6 +34,17 @@ public class PersonController {
         }
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> findById(@PathVariable int id) {
+        final PersonResponseDTO responseDTO = this.service.findById(id);
+
+        if (responseDTO != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
     @GetMapping
     public List<PersonResponseDTO> getAll() {
         return service.getAll();

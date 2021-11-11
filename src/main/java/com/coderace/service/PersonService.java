@@ -77,4 +77,10 @@ public class PersonService {
 
         return responseDTO;
     }
+
+    public PersonResponseDTO findById(int id) {
+        return this.repository.findById(id)
+                .map(this::buildPersonResponseDto)
+                .orElse(null);
+    }
 }

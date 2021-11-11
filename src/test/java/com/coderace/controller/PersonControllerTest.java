@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @DisplayName("PersonController test | Unit")
@@ -78,5 +79,40 @@ public class PersonControllerTest {
         // assert - then
         assertEquals(HttpStatus.BAD_REQUEST.value(), result.getResponse().getStatus());
         assertEquals(expectedMessage, actualMessage);
+    }
+
+    @Test
+    @DisplayName("findById | ok")
+    void findByIdOk() throws Exception {
+        // setup - given
+        final int id = 1;
+        final PersonResponseDTO expectedResponse = new PersonResponseDTO().setName("name").setAge(1).setCountry("arg");
+
+        when(service.findById(id)).thenReturn(expectedResponse);
+
+        // perform - when
+        final MvcResult result = mvc.perform(get("/person/" + id)).andReturn();
+
+        final PersonResponseDTO actualResponse =
+                objectMapper.readValue(result.getResponse().getContentAsString(), PersonResponseDTO.class);
+
+        // assert - then
+        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
+        assertEquals(expectedResponse, actualResponse);
+    }
+
+    @Test
+    @DisplayName("findById | not found")
+    void findByIdNotFound() throws Exception {
+        // setup - given
+        final int id = 1;
+
+        when(service.findById(id)).thenReturn(null);
+
+        // perform - when
+        final MvcResult result = mvc.perform(get("/person/" + id)).andReturn();
+
+        // assert - then
+        assertEquals(HttpStatus.NOT_FOUND.value(), result.getResponse().getStatus());
     }
 }
