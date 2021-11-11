@@ -2,7 +2,7 @@ package com.coderace.controller;
 
 import com.coderace.dto.PersonRequestDTO;
 import com.coderace.dto.PersonResponseDTO;
-import com.coderace.service.LogService;
+import com.coderace.service.log.LogService;
 import com.coderace.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,18 +18,12 @@ public class PersonController {
     @Autowired
     PersonService service;
 
-    @Autowired
-    LogService log;
-
     @PostMapping("/create")
     public ResponseEntity<Object> create(@RequestBody PersonRequestDTO requestDTO) {
-        log.setName("PersonController.create()");
-
         try {
             final PersonResponseDTO personResponseDTO = service.create(requestDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(personResponseDTO);
         } catch (RuntimeException e) {
-            log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }

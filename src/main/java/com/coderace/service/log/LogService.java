@@ -1,10 +1,10 @@
-package com.coderace.service;
+package com.coderace.service.log;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
-@Service
+@Component
 public class LogService {
     private String name;
 

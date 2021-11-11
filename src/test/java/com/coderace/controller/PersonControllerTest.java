@@ -2,7 +2,7 @@ package com.coderace.controller;
 
 import com.coderace.dto.PersonRequestDTO;
 import com.coderace.dto.PersonResponseDTO;
-import com.coderace.service.LogService;
+import com.coderace.service.log.LogService;
 import com.coderace.service.PersonService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
