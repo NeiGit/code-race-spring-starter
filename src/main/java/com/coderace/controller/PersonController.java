@@ -1,5 +1,6 @@
 package com.coderace.controller;
 
+import com.coderace.dto.PersonBulkCreateRequestDTO;
 import com.coderace.dto.PersonRequestDTO;
 import com.coderace.dto.PersonResponseDTO;
 import com.coderace.service.PersonService;
@@ -43,4 +44,15 @@ public class PersonController {
                                           @RequestParam(required = false) String country) {
         return service.getAll(age, country);
     }
+
+    @PostMapping("/bulk-create")
+    public ResponseEntity<Object> bulkCreate(@RequestBody PersonBulkCreateRequestDTO requestDTO) {
+        try {
+            final List<PersonResponseDTO> responseDTOs = service.bulkCreate(requestDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseDTOs);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
 }

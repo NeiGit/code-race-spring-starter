@@ -1,5 +1,6 @@
 package com.coderace.controller;
 
+import com.coderace.dto.PersonBulkCreateRequestDTO;
 import com.coderace.dto.PersonRequestDTO;
 import com.coderace.dto.PersonResponseDTO;
 import com.coderace.service.PersonService;
@@ -16,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -142,5 +144,49 @@ public class PersonControllerTest {
         // assert - then
         assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
         assertEquals(expectedResponse, actualResponse);
+    }
+
+    @Test
+    @DisplayName("bulkCreate | ok")
+    void bulkCreateOk() throws Exception {
+        // setup - given
+        final PersonBulkCreateRequestDTO request = new PersonBulkCreateRequestDTO();
+        final List<PersonResponseDTO> expectedResponse = Collections.singletonList(new PersonResponseDTO());
+
+        when(service.bulkCreate(request)).thenReturn(expectedResponse);
+
+        // perform - when
+        final MvcResult result = mvc.perform(post("/person/bulk-create")
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request)))
+                .andReturn();
+
+        final List<PersonResponseDTO> actualResponse =
+                objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<PersonResponseDTO>>(){});
+
+        // assert - then
+        assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus());
+        assertEquals(expectedResponse, actualResponse);
+    }
+
+    @Test
+    @DisplayName("bulkCreate | when service throws RuntimeException | bad request")
+    void bulkCreateBadRequest() throws Exception {
+        // setup - given
+        final PersonBulkCreateRequestDTO request = new PersonBulkCreateRequestDTO();
+
+        final String expectedMessage = "test-message";
+
+        when(service.bulkCreate(request)).thenThrow(new RuntimeException(expectedMessage));
+
+        // perform - when
+        final MvcResult result = mvc.perform(post("/person/bulk-create")
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request)))
+                .andReturn();
+
+        final String actualMessage = result.getResponse().getContentAsString();
+
+        // assert - then
+        assertEquals(HttpStatus.BAD_REQUEST.value(), result.getResponse().getStatus());
+        assertEquals(expectedMessage, actualMessage);
     }
 }

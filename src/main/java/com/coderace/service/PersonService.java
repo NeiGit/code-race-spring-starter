@@ -1,5 +1,6 @@
 package com.coderace.service;
 
+import com.coderace.dto.PersonBulkCreateRequestDTO;
 import com.coderace.dto.PersonRequestDTO;
 import com.coderace.dto.PersonResponseDTO;
 import com.coderace.entity.Person;
@@ -76,7 +77,12 @@ public class PersonService {
     }
 
     private void validate(PersonRequestDTO requestDTO) {
-        if (requestDTO.getAge() <= 0) {
+        validateAge(requestDTO.getAge());
+
+    }
+
+    private void validateAge(Integer age) {
+        if (age <= 0) {
             throw new RuntimeException("age must be greater than 0");
         }
     }
@@ -103,5 +109,24 @@ public class PersonService {
                 .setBornDate(bornDate.toString());
 
         return responseDTO;
+    }
+
+    public List<PersonResponseDTO> bulkCreate(PersonBulkCreateRequestDTO request) {
+        final int age = request.getAge();
+
+        this.validateAge(age);
+
+        final Person.Builder builder = new Person.Builder().setAge(age);
+
+        return request.getPersons().stream().map(personRequest -> {
+            final Person person = builder
+                    .setName(personRequest.getName())
+                    .setCountry(this.resolveCountry(personRequest.getCountry()))
+                    .build();
+
+            this.repository.save(person);
+
+            return this.buildPersonResponseDto(person);
+        }).collect(Collectors.toList());
     }
 }

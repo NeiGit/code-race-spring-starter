@@ -1,5 +1,6 @@
 package com.coderace.service;
 
+import com.coderace.dto.PersonBulkCreateRequestDTO;
 import com.coderace.dto.PersonRequestDTO;
 import com.coderace.dto.PersonResponseDTO;
 import com.coderace.entity.Person;
@@ -15,10 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -153,6 +151,48 @@ public class PersonServiceTest {
 
         // then
         assertNull(response);
+    }
+
+    @Test
+    @DisplayName("bulkCreate | ok")
+    void bulkCreateOk() {
+        // given
+        final PersonBulkCreateRequestDTO request = new PersonBulkCreateRequestDTO()
+                .setAge(10)
+                .setPersons(Arrays.asList(
+                        new PersonBulkCreateRequestDTO.PersonBulkCreateDTO().setName("name").setCountry("bra"),
+                        new PersonBulkCreateRequestDTO.PersonBulkCreateDTO().setName("name").setCountry("bra"),
+                        new PersonBulkCreateRequestDTO.PersonBulkCreateDTO().setName("name").setCountry("bra"),
+                        new PersonBulkCreateRequestDTO.PersonBulkCreateDTO().setName("name").setCountry("bra")
+                        )
+                );
+
+        final Person person = new Person("name", 10, Country.BRA);
+
+        when(repository.save(any(Person.class))).thenReturn(person);
+
+        // when
+        final List<PersonResponseDTO> response = service.bulkCreate(request);
+
+        // then
+        assertTrue(response.stream().allMatch(dto -> dto.equals(this.toDto(person))));
+    }
+
+    @Test
+    @DisplayName("bulkCreate | when age is -1 | should throw RuntimeException")
+    void bulkCreateInvalidAge() {
+        // given
+        final PersonBulkCreateRequestDTO request = new PersonBulkCreateRequestDTO()
+                .setAge(0)
+                .setPersons(new ArrayList<>());
+
+        // when
+        final RuntimeException exception = assertThrows(RuntimeException.class, () -> service.bulkCreate(request));
+
+        // then
+        assertEquals("age must be greater than 0", exception.getMessage());
+
+        verify(repository, never()).save(any(Person.class));
     }
 
     private PersonResponseDTO toDto(Person person) {
