@@ -41,8 +41,9 @@ public class PersonController {
 
     @GetMapping
     public List<PersonResponseDTO> getAll(@RequestParam(required = false) Integer age,
-                                          @RequestParam(required = false) String country) {
-        return service.getAll(age, country);
+                                          @RequestParam(required = false) String country,
+                                          @RequestParam(required = false) Integer sorter) {
+        return service.getAll(age, country, sorter);
     }
 
     @PostMapping("/bulk-create")

@@ -124,18 +124,20 @@ public class PersonControllerTest {
         // setup - given
         final int age = 1;
         final String country = "arg";
+        final int sorter = 1;
 
         final List<PersonResponseDTO> expectedResponse = Arrays.asList(
                 new PersonResponseDTO().setName("name1").setAge(1).setCountry("arg").setBornDate("born-date"),
                 new PersonResponseDTO().setName("name2").setAge(2).setCountry("bra").setBornDate("born-date")
         );
 
-        when(service.getAll(age, country)).thenReturn(expectedResponse);
+        when(service.getAll(age, country, sorter)).thenReturn(expectedResponse);
 
         // perform - when
         final MvcResult result = mvc.perform(get("/person")
                 .param("age", String.valueOf(age))
-                .param("country", country))
+                .param("country", country)
+                .param("sorter", String.valueOf(sorter)))
                 .andReturn();
 
         final List<PersonResponseDTO> actualResponse =

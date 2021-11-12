@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,9 +44,9 @@ public class PersonService {
         return buildPersonResponseDto(persistedPerson);
     }
 
-    public List<PersonResponseDTO> getAll(Integer minAge, String country) {
+    public List<PersonResponseDTO> getAll(Integer minAge, String country, Integer sorter) {
         final List<Person> allPersons = repository.findAll();
-        final List<Person> filteredPersons = this.filter(allPersons, minAge, country);
+        final List<Person> filteredPersons = this.filter(allPersons, minAge, country, sorter);
 
         final List<PersonResponseDTO> responseDTOs = new ArrayList<>();
 
@@ -63,9 +65,10 @@ public class PersonService {
                 .orElse(null);
     }
 
-    private List<Person> filter(List<Person> persons, Integer minAge, String countryCode) {
+    private List<Person> filter(List<Person> persons, Integer minAge, String countryCode, Integer sorter) {
         final Country countryFilter = countryCode == null ? null : Country.fromCode(countryCode);
-        int ageFilter = minAge != null ? minAge : Integer.MIN_VALUE;
+        final int ageFilter = minAge != null ? minAge : Integer.MIN_VALUE;
+        final AgeSorter ageSorter = AgeSorter.fromCode(sorter);
 
         return persons.stream()
                 .filter(person -> {
@@ -73,7 +76,9 @@ public class PersonService {
                     final boolean ageCondition = person.getAge() > ageFilter;
 
                     return countryCondition && ageCondition;
-                }).collect(Collectors.toList());
+                })
+                .sorted(ageSorter.comparator())
+                .collect(Collectors.toList());
     }
 
     private void validate(PersonRequestDTO requestDTO) {
@@ -128,5 +133,44 @@ public class PersonService {
 
             return this.buildPersonResponseDto(person);
         }).collect(Collectors.toList());
+    }
+
+    private enum AgeSorter {
+        ASC(1) {
+            @Override
+            public Comparator<Person> comparator() {
+                return (p1, p2) -> p1.getAge() - p2.getAge();
+            }
+        },
+
+        DESC(2) {
+            @Override
+            public Comparator<Person> comparator() {
+                return ASC.comparator().reversed();
+            }
+        },
+
+        DEFAULT(null) {
+            @Override
+            public Comparator<Person> comparator() {
+                return (p1, p2) -> 0;
+            }
+        };
+
+        private final Integer code;
+
+        AgeSorter(Integer code) {
+            this.code = code;
+        }
+
+        public abstract Comparator<Person> comparator();
+
+        private static AgeSorter fromCode(Integer code) {
+            return Arrays.stream(values())
+                    .filter(v -> v.code != null)
+                    .filter(v -> v.code.equals(code))
+                    .findFirst()
+                    .orElse(DEFAULT);
+        }
     }
 }

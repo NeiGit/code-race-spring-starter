@@ -64,7 +64,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    @DisplayName("getAll | no filters | ok")
+    @DisplayName("getAll | no filters no sorter | ok")
     void getAllNoFiltersOk() {
         final Person person1 = new Person("name1", 1, Country.ARG);
         final Person person2 = new Person("name2", 2, Country.BRA);
@@ -73,13 +73,13 @@ public class PersonServiceTest {
 
         when(repository.findAll()).thenReturn(persons);
 
-        final List<PersonResponseDTO> result = service.getAll(null, null);
+        final List<PersonResponseDTO> result = service.getAll(null, null, null);
 
         assertEquals(persons.stream().map(this::toDto).collect(Collectors.toList()), result);
     }
 
     @Test
-    @DisplayName("getAll | with filters | ok")
+    @DisplayName("getAll | with filters no sorter | ok")
     void getAllWithFiltersOk() {
         final Person person1 = new Person("name1", 4, Country.ARG);
         final Person person2 = new Person("name2", 5, Country.USA);
@@ -89,9 +89,29 @@ public class PersonServiceTest {
 
         when(repository.findAll()).thenReturn(persons);
 
-        final List<PersonResponseDTO> result = service.getAll(3, "arg");
+        final List<PersonResponseDTO> result = service.getAll(3, "arg", null);
 
         assertEquals(Collections.singletonList(this.toDto(person1)), result);
+    }
+
+    @Test
+    @DisplayName("getAll | with filters and sorter desc | ok")
+    void getAllWithFiltersAndSorterDescOk() {
+        final Person person1 = new Person("name1", 4, Country.ARG);
+        final Person person2 = new Person("name2", 10, Country.BRA);
+        final Person person3 = new Person("name3", 5, Country.USA);
+        final Person person4 = new Person("name4", 1, Country.BRA);
+
+        final List<Person> persons = Arrays.asList(person1, person2, person3, person4);
+
+        when(repository.findAll()).thenReturn(persons);
+
+        final List<PersonResponseDTO> result = service.getAll(3, null, 2);
+
+        // check sort process
+        assertEquals(this.toDto(person2), result.get(0));
+        assertEquals(this.toDto(person3), result.get(1));
+        assertEquals(this.toDto(person1), result.get(2));
     }
 
     @Test
